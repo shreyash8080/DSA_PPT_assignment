@@ -1,0 +1,422 @@
+Question 1: -
+
+Write a program that takes a string as input, and counts the frequency of each word in the string, there might be repeated characters in the string. Your task is to find the highest frequency and returns the length of the highest-frequency word.
+
+Note - You have to write at least 2 additional test cases in which your program will run successfully and provide an explanation for the same. Example input - string = “write write write all the number from from from 1 to 100” Example output - 5 Explanation - From the given string we can note that the most frequent words are “write” and “from” and the maximum value of both the values is “write” and its corresponding length is 5
+
+from collections import Counter
+
+def highest_frequency_length(string):
+    # Split the string into words
+    words = string.split()
+
+    # Count the frequency of each word
+    word_count = Counter(words)
+
+    # Find the word with the highest frequency
+    highest_frequency_word = max(word_count, key=word_count.get)
+
+    # Return the length of the highest-frequency word
+    return len(highest_frequency_word)
+
+string = "write write write all the number from from from 1 to 100"
+result = highest_frequency_length(string)
+print(result)
+5
+Question 2: -
+
+Consider a string to be valid if all characters of the string appear the same number of times. It is also valid if he can remove just one character at the index in the string, and the remaining characters will occur the same number of times. Given a string, determine if it is valid. If so, return YES , otherwise return NO .
+
+Note - You have to write at least 2 additional test cases in which your program will run successfully and provide an explanation for the same. Example input 1 - s = “abc”. This is a valid string because frequencies are { “a”: 1, “b”: 1, “c”: 1 } Example output 1- YES Example input 2 - s “abcc”. This string is not valid as we can remove only 1 occurrence of “c”. That leaves character frequencies of { “a”: 1, “b”: 1 , “c”: 2 } Example output 2 - NO
+
+from collections import Counter
+
+def is_valid_string(s):
+    # Count the frequency of each character
+    char_count = Counter(s)
+
+    # Count the frequency of frequencies
+    freq_count = Counter(char_count.values())
+
+    # If all characters have the same frequency, it is a valid string
+    if len(freq_count) == 1:
+        return "YES"
+
+    # If there are more than two different frequencies, it is not a valid string
+    if len(freq_count) > 2:
+        return "NO"
+
+    # If there are exactly two different frequencies
+    freq_list = list(freq_count.items())
+    freq1, count1 = freq_list[0]
+    freq2, count2 = freq_list[1]
+
+    # If one of the frequencies has a count of 1 and the difference is 1, it is a valid string
+    if (count1 == 1 and freq1 == 1) or (count2 == 1 and freq2 == 1):
+        return "YES"
+
+    # If the difference between the frequencies is 1 and one of them has a count of 1, it is a valid string
+    if abs(freq1 - freq2) == 1 and (count1 == 1 or count2 == 1):
+        return "YES"
+
+    # Otherwise, it is not a valid string
+    return "NO"
+
+s1 = "abc"
+print(is_valid_string(s1))  # Output: YES
+
+s2 = "abcc"
+print(is_valid_string(s2))  # Output: NO
+YES
+YES
+Question 3: -
+
+Write a program, which would download the data from the provided link, and then read the data and convert that into properly structured data and return it in Excel format.
+
+Note - Write comments wherever necessary explaining the code written. Link - https://raw.githubusercontent.com/Biuni/PokemonGO-Pokedex/master/pokedex.json Data Attributes - id: Identification Number - int num: Number of the ● Pokémon in the official Pokédex - int name: Pokémon name - ● string img: URL to an image of this Pokémon - string type: ● Pokémon type -string height: Pokémon height - float ● weight: Pokémon weight - float candy: type of candy used to evolve Pokémon or given ● when transferred - string candy_count: the amount of candies required to evolve
+
+int
+● egg: Number of kilometers to travel to hatch the egg - float spawn_chance: ● Percentage of spawn chance (NEW) - float avg_spawns: Number of this pokemon on 10.000 spawns (NEW) - int ● spawn_time: Spawns most active at the time on this field. Spawn times are the same for all time zones and are expressed in local time. (NEW) - “minutes: seconds” multipliers: Multiplier of Combat Power (CP) for calculating the CP after evolution See below - list of int weakness: Types of ● Pokémon this Pokémon is weak to - list of strings next_evolution: Number and Name of successive evolutions of Pokémon - list of dict prev_evolution: Number and Name of previous evolutions of Pokémon - - list of dict
+
+import requests
+import json
+import pandas as pd
+
+def download_and_convert_to_excel(url, output_file):
+    # Make the HTTP request to download the data
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        # Parse the JSON data
+        data = json.loads(response.text)
+
+        # Extract the required attributes from the data
+        pokemon_data = []
+        for pokemon in data['pokemon']:
+            pokemon_info = {
+                'id': pokemon['id'],
+                'num': pokemon['num'],
+                'name': pokemon['name'],
+                'img': pokemon['img'],
+                'type': ', '.join(pokemon['type']),
+                'height': pokemon['height'],
+                'weight': pokemon['weight'],
+                'candy': pokemon.get('candy', ''),
+                'candy_count': pokemon.get('candy_count', ''),
+                'egg': pokemon.get('egg', ''),
+                'spawn_chance': pokemon.get('spawn_chance', ''),
+                'avg_spawns': pokemon.get('avg_spawns', ''),
+                'spawn_time': pokemon.get('spawn_time', ''),
+                'weakness': ', '.join(pokemon.get('weaknesses', [])),
+                'next_evolution': ', '.join(evo['name'] for evo in pokemon.get('next_evolution', [])),
+                'prev_evolution': ', '.join(evo['name'] for evo in pokemon.get('prev_evolution', []))
+            }
+            pokemon_data.append(pokemon_info)
+
+        # Convert the structured data to a pandas DataFrame
+        df = pd.DataFrame(pokemon_data)
+
+        # Export the DataFrame to Excel
+        df.to_excel(output_file, index=False)
+        print("Data has been converted and saved to", output_file)
+    else:
+        print("Failed to download data from the provided link")
+
+# Example usage
+url = "https://raw.githubusercontent.com/Biuni/PokemonGO-Pokedex/master/pokedex.json"
+output_file = "pokemon_data.xlsx"
+download_and_convert_to_excel(url, output_file)
+Data has been converted and saved to pokemon_data.xlsx
+Question 4 -
+
+Write a program to download the data from the link given below and then read the data and convert the into the proper structure and return it as a CSV file. Link - https://data.nasa.gov/resource/y77d-th95.json Note - Write code comments wherever needed for code understanding.
+
+Excepted Output Data Attributes ● Name of Earth Meteorite - string id - ID of Earth ● Meteorite - int nametype - string recclass - string ● mass - Mass of Earth Meteorite - float year - Year at which Earth ● Meteorite was hit - datetime format reclat - float recclong - float ● point coordinates - list of int
+
+import requests
+import json
+import csv
+
+def download_and_convert_to_csv(url, output_file):
+    # Make the HTTP request to download the data
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        # Parse the JSON data
+        data = json.loads(response.text)
+
+        # Extract the required attributes from the data
+        meteorite_data = []
+        for meteorite in data:
+            meteorite_info = {
+                'name': meteorite['name'],
+                'id': meteorite['id'],
+                'nametype': meteorite['nametype'],
+                'recclass': meteorite['recclass'],
+            }
+            meteorite_data.append(meteorite_info)
+
+        # Write the structured data to a CSV file
+        with open(output_file, 'w', newline='') as csvfile:
+            fieldnames = meteorite_data[0].keys()
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(meteorite_data)
+
+        print("Data has been converted and saved to", output_file)
+    else:
+        print("Failed to download data from the provided link")
+
+        
+url = "https://data.nasa.gov/resource/y77d-th95.json"
+output_file = "meteorite_data.csv"
+download_and_convert_to_csv(url, output_file)
+Question 5 -
+
+Write a program to download the data from the given API link and then extract the following data with proper formatting Link - http://api.tvmaze.com/singlesearch/shows?q=westworld&embed=episodes Note - Write proper code comments wherever needed for the code understanding Sample Data - Excepted Output Data Attributes - ● id - int url - string ● name - string season ● - int number - int ● type - string airdate - ● date format airtime - ● 12-hour time format ● runtime - float ● average rating - float ● summary - string ● without html tags ● medium image link - string ● Original image link - string
+
+import requests
+import json
+from bs4 import BeautifulSoup
+
+def download_and_extract_data(url):
+    # Make the HTTP request to download the data
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        # Parse the JSON data
+        data = json.loads(response.text)
+
+        # Extract the show details
+        show_id = data['id']
+        show_url = data['url']
+        show_name = data['name']
+        show_type = data['type']
+        show_summary = BeautifulSoup(data['summary'], 'html.parser').get_text()
+        show_image = data['image']['medium']
+        show_image_original = data['image']['original']
+
+        # Extract the episode details
+        episodes = data['_embedded']['episodes']
+        episode_data = []
+        for episode in episodes:
+            episode_info = {
+                'season': episode['season'],
+                'number': episode['number'],
+                'airdate': episode['airdate'],
+                'airtime': episode['airtime'],
+                'runtime': episode['runtime'],
+                'average_rating': episode['rating']['average']
+            }
+            episode_data.append(episode_info)
+
+        return {
+            'show_id': show_id,
+            'show_url': show_url,
+            'show_name': show_name,
+            'show_type': show_type,
+            'show_summary': show_summary,
+            'show_image': show_image,
+            'show_image_original': show_image_original,
+            'episodes': episode_data
+        }
+
+    else:
+        print("Failed to download data from the provided link")
+
+url = "http://api.tvmaze.com/singlesearch/shows?q=westworld&embed=episodes"
+result = download_and_extract_data(url)
+print(result)
+{'show_id': 1371, 'show_url': 'https://www.tvmaze.com/shows/1371/westworld', 'show_name': 'Westworld', 'show_type': 'Scripted', 'show_summary': 'Westworld is a dark odyssey about the dawn of artificial consciousness and the evolution of sin. Set at the intersection of the near future and the reimagined past, it explores a world in which every human appetite, no matter how noble or depraved, can be indulged.', 'show_image': 'https://static.tvmaze.com/uploads/images/medium_portrait/445/1113927.jpg', 'show_image_original': 'https://static.tvmaze.com/uploads/images/original_untouched/445/1113927.jpg', 'episodes': [{'season': 1, 'number': 1, 'airdate': '2016-10-02', 'airtime': '21:00', 'runtime': 68, 'average_rating': 8}, {'season': 1, 'number': 2, 'airdate': '2016-10-09', 'airtime': '21:00', 'runtime': 60, 'average_rating': 7.7}, {'season': 1, 'number': 3, 'airdate': '2016-10-16', 'airtime': '21:00', 'runtime': 60, 'average_rating': 7.6}, {'season': 1, 'number': 4, 'airdate': '2016-10-23', 'airtime': '21:00', 'runtime': 60, 'average_rating': 7.9}, {'season': 1, 'number': 5, 'airdate': '2016-10-30', 'airtime': '21:00', 'runtime': 60, 'average_rating': 8}, {'season': 1, 'number': 6, 'airdate': '2016-11-06', 'airtime': '21:00', 'runtime': 60, 'average_rating': 8}, {'season': 1, 'number': 7, 'airdate': '2016-11-13', 'airtime': '21:00', 'runtime': 60, 'average_rating': 8.6}, {'season': 1, 'number': 8, 'airdate': '2016-11-20', 'airtime': '21:00', 'runtime': 60, 'average_rating': 7.9}, {'season': 1, 'number': 9, 'airdate': '2016-11-27', 'airtime': '21:00', 'runtime': 60, 'average_rating': 8.5}, {'season': 1, 'number': 10, 'airdate': '2016-12-04', 'airtime': '21:00', 'runtime': 90, 'average_rating': 8.7}, {'season': 2, 'number': 1, 'airdate': '2018-04-22', 'airtime': '21:00', 'runtime': 74, 'average_rating': 7.8}, {'season': 2, 'number': 2, 'airdate': '2018-04-29', 'airtime': '21:00', 'runtime': 60, 'average_rating': 7.7}, {'season': 2, 'number': 3, 'airdate': '2018-05-06', 'airtime': '21:00', 'runtime': 60, 'average_rating': 7.7}, {'season': 2, 'number': 4, 'airdate': '2018-05-13', 'airtime': '21:00', 'runtime': 71, 'average_rating': 8}, {'season': 2, 'number': 5, 'airdate': '2018-05-20', 'airtime': '21:00', 'runtime': 60, 'average_rating': 7.6}, {'season': 2, 'number': 6, 'airdate': '2018-05-27', 'airtime': '21:00', 'runtime': 60, 'average_rating': 7.7}, {'season': 2, 'number': 7, 'airdate': '2018-06-03', 'airtime': '21:00', 'runtime': 60, 'average_rating': 7.9}, {'season': 2, 'number': 8, 'airdate': '2018-06-10', 'airtime': '21:00', 'runtime': 60, 'average_rating': 8.7}, {'season': 2, 'number': 9, 'airdate': '2018-06-17', 'airtime': '21:00', 'runtime': 60, 'average_rating': 8.4}, {'season': 2, 'number': 10, 'airdate': '2018-06-24', 'airtime': '21:00', 'runtime': 90, 'average_rating': 8.5}, {'season': 3, 'number': 1, 'airdate': '2020-03-15', 'airtime': '21:00', 'runtime': 70, 'average_rating': 8}, {'season': 3, 'number': 2, 'airdate': '2020-03-22', 'airtime': '21:00', 'runtime': 60, 'average_rating': 7.8}, {'season': 3, 'number': 3, 'airdate': '2020-03-29', 'airtime': '21:00', 'runtime': 60, 'average_rating': 7.8}, {'season': 3, 'number': 4, 'airdate': '2020-04-05', 'airtime': '21:00', 'runtime': 70, 'average_rating': 8}, {'season': 3, 'number': 5, 'airdate': '2020-04-12', 'airtime': '21:00', 'runtime': 60, 'average_rating': 7.9}, {'season': 3, 'number': 6, 'airdate': '2020-04-19', 'airtime': '21:00', 'runtime': 60, 'average_rating': 7.5}, {'season': 3, 'number': 7, 'airdate': '2020-04-26', 'airtime': '21:00', 'runtime': 60, 'average_rating': 7.5}, {'season': 3, 'number': 8, 'airdate': '2020-05-03', 'airtime': '21:00', 'runtime': 75, 'average_rating': 7.7}, {'season': 4, 'number': 1, 'airdate': '2022-06-26', 'airtime': '21:00', 'runtime': 55, 'average_rating': 7.1}, {'season': 4, 'number': 2, 'airdate': '2022-07-03', 'airtime': '21:00', 'runtime': 55, 'average_rating': 7.4}, {'season': 4, 'number': 3, 'airdate': '2022-07-10', 'airtime': '21:00', 'runtime': 55, 'average_rating': 7.6}, {'season': 4, 'number': 4, 'airdate': '2022-07-17', 'airtime': '21:00', 'runtime': 51, 'average_rating': 7.7}, {'season': 4, 'number': 5, 'airdate': '2022-07-24', 'airtime': '21:00', 'runtime': 60, 'average_rating': 7.8}, {'season': 4, 'number': 6, 'airdate': '2022-07-31', 'airtime': '21:00', 'runtime': 60, 'average_rating': 7.5}, {'season': 4, 'number': 7, 'airdate': '2022-08-07', 'airtime': '21:00', 'runtime': 60, 'average_rating': 7.7}, {'season': 4, 'number': 8, 'airdate': '2022-08-14', 'airtime': '21:00', 'runtime': 60, 'average_rating': 7.5}]}
+import pandas as pd
+import matplotlib.pyplot as plt
+
+def analyze_meteorite_data(data_file):
+    # Read the CSV file into a pandas DataFrame
+    df = pd.read_csv(data_file)
+
+    # Convert 'year' column to datetime format
+    df['year'] = pd.to_datetime(df['year'])
+
+    # Get all the Earth meteorites that fell before the year 2000
+    earth_meteorites_before_2000 = df[df['year'] < pd.Timestamp('2000-01-01')]
+
+    # Get all the Earth meteorites coordinates that fell before the year 1970
+    earth_meteorites_coords_before_1970 = df[(df['year'] < pd.Timestamp('1970-01-01')) & (df['reclat'].notna()) & (df['reclong'].notna())]
+
+    # Get all the Earth meteorites with mass more than 10000 kg
+    earth_meteorites_mass_gt_10000 = df[df['mass'] > 10000]
+
+    # Plotting the data
+
+    # Histogram of years for all Earth meteorites
+    plt.figure(figsize=(8, 6))
+    plt.hist(df['year'], bins=50, color='skyblue')
+    plt.xlabel('Year')
+    plt.ylabel('Frequency')
+    plt.title('Distribution of Earth Meteorites by Year')
+    plt.xticks(rotation=45)
+    plt.grid(True)
+    plt.show()
+
+    # Scatter plot of coordinates for Earth meteorites before 1970
+    plt.figure(figsize=(8, 6))
+    plt.scatter(earth_meteorites_coords_before_1970['reclong'], earth_meteorites_coords_before_1970['reclat'], color='green')
+    plt.xlabel('Longitude')
+    plt.ylabel('Latitude')
+    plt.title('Coordinates of Earth Meteorites before 1970')
+    plt.grid(True)
+    plt.show()
+
+    # Bar plot of mass for Earth meteorites with mass > 10000 kg
+    plt.figure(figsize=(8, 6))
+    plt.bar(earth_meteorites_mass_gt_10000['name'], earth_meteorites_mass_gt_10000['mass'], color='orange')
+    plt.xlabel('Meteorite Name')
+    plt.ylabel('Mass (g)')
+    plt.title('Earth Meteorites with Mass > 10000 kg')
+    plt.xticks(rotation=90)
+    plt.grid(True)
+    plt.show()
+
+    # Return the filtered dataframes for further analysis if needed
+    return earth_meteorites_before_2000, earth_meteorites_coords_before_1970, earth_meteorites_mass_gt_10000
+
+# Example usage
+data_file = "meteorite_data.csv"
+analyze_meteorite_data(data_file)
+Question 8 -
+
+Using the data from Question 5, write code the analyze the data and answer the following questions Note -
+
+Draw plots to demonstrate the analysis for the following questions and better visualizations
+Write code comments wherever required for code understanding
+Insights to be drawn - ● Get all the overall ratings for each season and using plots compare the ratings for all the seasons, like season 1 ratings, season 2, and so on. ● Get all the episode names, whose average rating is more than 8 for every season ● Get all the episode names that aired before May 2019 ● Get the episode name from each season with the highest and lowest rating ● Get the summary for the most popular ( ratings ) episode in every season
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import os
+
+
+def analyze_tv_show_data():
+    
+    # Read the JSON data into a pandas DataFrame
+    df = pd.read_json('data')
+
+    # Get all the overall ratings for each season
+    season_ratings = df.groupby('season')['average_rating'].mean()
+
+    # Plotting the ratings for each season
+    plt.figure(figsize=(8, 6))
+    season_ratings.plot(kind='bar', color='blue')
+    plt.xlabel('Season')
+    plt.ylabel('Average Rating')
+    plt.title('Average Ratings for Each Season')
+    plt.xticks(rotation=0)
+    plt.grid(True)
+    plt.show()
+
+    # Get all the episode names with average rating > 8 for every season
+    high_rated_episodes = df[df['average_rating'] > 8]['name']
+
+    # Get all the episode names that aired before May 2019
+    episodes_before_may_2019 = df[df['airdate'] < '2019-05-01']['name']
+
+    # Get the episode name from each season with the highest and lowest rating
+    highest_rated_episodes = df.groupby('season')['average_rating'].idxmax().apply(lambda x: df.loc[x, 'name'])
+    lowest_rated_episodes = df.groupby('season')['average_rating'].idxmin().apply(lambda x: df.loc[x, 'name'])
+
+    # Get the summary for the most popular (highest ratings) episode in every season
+    most_popular_episodes_summary = df.groupby('season')['average_rating'].idxmax().apply(lambda x: df.loc[x, 'summary'])
+
+    # Return the results for further analysis if needed
+    return season_ratings, high_rated_episodes, episodes_before_may_2019, highest_rated_episodes, lowest_rated_episodes, most_popular_episodes_summary
+
+analyze_tv_show_data()
+Question 9 -
+
+Write a program to read the data from the following link, perform data analysis and answer the following questions Note -
+
+Write code comments wherever required for code understanding
+Link - https://data.wa.gov/api/views/f6w7-q2d2/rows.csv?accessType=DOWNLOAD Insights to be drawn - ● Get all the cars and their types that do not qualify for clean alternative fuel vehicle ● Get all TESLA cars with the model year, and model type made in Bothell City. ● Get all the cars that have an electric range of more than 100, and were made after 2015 ● Draw plots to show the distribution between city and electric vehicle type
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+def analyze_car_data(data_url):
+    # Read the CSV data from the provided URL into a pandas DataFrame
+    df = pd.read_csv(data_url)
+
+    # Get all the cars and their types that do not qualify for clean alternative fuel vehicle
+    non_clean_cars = df[df['Qualifies for Clean Alternative Fuel Vehicle'] == 'No'][['Make', 'Model Type']]
+
+    # Get all TESLA cars with the model year, and model type made in Bothell City
+    tesla_bothell_cars = df[(df['Make'] == 'TESLA') & (df['City'] == 'Bothell')][['Model Year', 'Model Type']]
+
+    # Get all the cars that have an electric range of more than 100 and were made after 2015
+    electric_cars_gt_100_range = df[(df['Electric Range'] > 100) & (df['Model Year'] > 2015)][['Make', 'Model Type']]
+
+    # Plotting the distribution between city and electric vehicle type
+    plt.figure(figsize=(10, 6))
+    city_electric_vehicle_counts = df[df['Electric Vehicle Type'].notna()]['City'].value_counts()
+    city_electric_vehicle_counts.plot(kind='bar', color='skyblue')
+    plt.xlabel('City')
+    plt.ylabel('Count')
+    plt.title('Distribution of Electric Vehicle Types by City')
+    plt.xticks(rotation=45)
+    plt.grid(True)
+    plt.show()
+
+    # Return the results for further analysis if needed
+    return non_clean_cars, tesla_bothell_cars, electric_cars_gt_100_range
+
+data_url = "https://data.wa.gov/api/views/f6w7-q2d2/rows.csv?accessType=DOWNLOAD"
+analyze_car_data(data_url)
+Question 10 -
+
+Write a program to count the number of verbs, nouns, pronouns, and adjectives in a given particular phrase or paragraph, and return their respective count as a dictionary. Note -
+
+Write code comments wherever required for code
+You have to write at least 2 additional test cases in which your program will run successfully and provide
+an explanation for the same
+
+nltk.download('punkt')
+nltk.download('averaged_perceptron_tagger')
+[nltk_data] Downloading package punkt to C:\Users\Ayush
+[nltk_data]     Poojari\AppData\Roaming\nltk_data...
+[nltk_data]   Package punkt is already up-to-date!
+[nltk_data] Downloading package averaged_perceptron_tagger to
+[nltk_data]     C:\Users\Ayush Poojari\AppData\Roaming\nltk_data...
+[nltk_data]   Unzipping taggers\averaged_perceptron_tagger.zip.
+True
+import nltk
+from nltk.tokenize import word_tokenize
+from nltk.tag import pos_tag
+from collections import defaultdict
+
+def count_pos_tags(text):
+    # Tokenize the text into individual words
+    words = word_tokenize(text)
+
+    # Perform part-of-speech tagging
+    pos_tags = pos_tag(words)
+
+    # Initialize a dictionary to store the counts of different POS tags
+    pos_counts = defaultdict(int)
+
+    # Count the occurrences of different POS tags
+    for word, pos in pos_tags:
+        if pos.startswith('N'):  # Nouns
+            pos_counts['Nouns'] += 1
+        elif pos.startswith('V'):  # Verbs
+            pos_counts['Verbs'] += 1
+        elif pos.startswith('PRP'):  # Pronouns
+            pos_counts['Pronouns'] += 1
+        elif pos.startswith('JJ'):  # Adjectives
+            pos_counts['Adjectives'] += 1
+
+    return pos_counts
+
+text = "The quick brown fox jumps over the lazy dog."
+pos_counts = count_pos_tags(text)
+print(pos_counts)
+defaultdict(<class 'int'>, {'Adjectives': 2, 'Nouns': 3, 'Verbs': 1})
